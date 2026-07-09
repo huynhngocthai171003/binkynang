@@ -510,7 +510,7 @@
 
         mainModuleSelect.onchange = () => {
             if (mainModuleSelect.value === 'learn') {
-                stopPlaying(); // Cưỡng bức dừng âm thanh cũ nếu đang phát bản tin
+                stopPlaying(); 
                 practiceModule.classList.add('hidden');
                 learnModule.classList.remove('hidden');
                 learnModule.classList.add('flex');
@@ -558,7 +558,10 @@
 
         let realText = "", isHidden = false, isPlaying = false;
         let speedSettings = { charGap: 350, wordGap: 1000 };
-        const globalAudio = new Audio();
+
+        // GIẢI PHÁP CHO SAFARI: Chỉ khởi tạo cố định 2 luồng kênh Audio độc lập để tái sử dụng
+        const normalAudio = new Audio();
+        const chAudio = new Audio();
 
         const input = document.getElementById('inputText');
         const telexPreview = document.getElementById('telexPreview');
@@ -596,7 +599,7 @@
 
         function toTelex(str) {
             const charMap = {'à':'a','á':'a','ả':'a','ã':'a','ạ':'a','ằ':'aw','ắ':'aw','ẳ':'aw','ẵ':'aw','ặ':'aw','ầ':'aa','ấ':'aa','ẩ':'aa','ẫ':'aa','ậ':'aa','è':'e','é':'e','ẻ':'e','ẽ':'e','ẹ':'e','ề':'ee','ế':'ee','ể':'ee','ễ':'ee','ệ':'ee','ì':'i','í':'i','ỉ':'i','ĩ':'i','ị':'i','ò':'o','ó':'o','ỏ':'o','õ':'o','ọ':'o','ồ':'oo','ố':'oo','ổ':'oo','ỗ':'oo','ộ':'oo','ờ':'ow','ớ':'ow','ở':'ow','ỡ':'ow','ợ':'ow','ù':'u','ú':'u','ủ':'u','ũ':'u','ụ':'u','ừ':'uw','ứ':'uw','ử':'uw','ữ':'uw','ự':'uw','ỳ':'y','ý':'y','ỷ':'y','ỹ':'y','ị':'y','đ':'dd','â':'aa','ă':'aw','ê':'ee','ô':'oo','ơ':'ow','ư':'uw'};
-            const toneMap = {'á':'s','à':'f','ả':'r','ã':'x','ạ':'j','ắ':'s','ằ':'f','ẳ':'r','ẵ':'x','ặ':'j','ấ':'s','ầ':'f','ẩ':'r','ẫ':'x','ậ':'j','é':'s','è':'f','ẻ':'r','ẽ':'x','ẹ':'j','ế':'s','ề':'f','ể':'r','ễ':'x','ệ':'j','í':'s','ì':'f','ỉ':'r','ĩ':'x','ị':'j','ó':'s','ò':'f','ỏ':'r','õ':'x','ọ':'j','ố':'s','ồ':'f','ổ':'r','ỗ':'x','ộ':'j','ớ':'s','ờ':'f','ở':'r','ỡ':'x','ợ':'j','ú':'s','ù':'f','ủ':'r','ũ':'x','ụ':'j','ứ':'s','ừ':'f','ử':'r','ữ':'x','ự':'j','ý':'s','ỳ':'f','ỷ':'r','ỹ':'x','ỵ':'j'};
+            const toneMap = {'á':'s','à':'f','ả':'r','ã':'x','ạ':'j','ắ':'s','ằ':'f','ẳ裝':'r','ẵ':'x','ặ':'j','ấ':'s','ầ':'f','ẩ':'r','ẫ':'x','ậ':'j','é':'s','è':'f','ẻ':'r','ẽ':'x','ẹ':'j','ế':'s','ề':'f','ể':'r','ễ':'x','ệ':'j','í':'s','ì':'f','ỉ':'r','ĩ':'x','ị':'j','ó':'s','ò':'f','ỏ':'r','õ':'x','ọ':'j','ố':'s','ồ':'f','ổ':'r','ỗ':'x','ộ':'j','ớ':'s','ờ':'f','ở':'r','ỡ':'x','ợ':'j','ú':'s','ù':'f','ủ':'r','ũ':'x','ụ':'j','ứ':'s','ừ':'f','ử':'r','ữ':'x','ự':'j','ý':'s','ỳ':'f','ỷ':'r','ỹ':'x','ỵ':'j'};
             
             let cleanStr = str.toLowerCase().replace(/[^a-z0-9àáảãạằắẳẵặầấẩẫậèéẻẽẹềếểễệìíỉĩịòóỏõọồốổỗộờớởỡợùúủũụừứửữựỳýỷỹịđâăêôơư\s]/g, '');
 
@@ -716,7 +719,6 @@
         }
         document.getElementById('btnCloseModal').onclick = () => modal.classList.add('hidden');
 
-        // Bấm vùng ngoài để đóng modal
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
                 modal.classList.add('hidden');
@@ -762,31 +764,34 @@
             else if(val === 'fast') speedSettings = { charGap: 100, wordGap: 500 };
         };
 
-        let activeAudios = []; 
-
+        // Hàm phát chuẩn cho Safari: Tái sử dụng luồng thiết bị, không tạo đối tượng rác ngầm
         async function playAudioFile(fileName) {
             return new Promise((resolve) => {
                 if (!isPlaying) { resolve(); return; }
-                const audio = new Audio(SOUND_PATH + fileName);
-                activeAudios.push(audio); 
-                audio.load();
-                audio.play().catch(() => resolve());
-                audio.onended = () => {
-                    activeAudios = activeAudios.filter(a => a !== audio);
-                    resolve();
-                };
+                normalAudio.src = SOUND_PATH + fileName;
+                normalAudio.textControlToken = Math.random(); // Đánh dấu token
+                normalAudio.currentTime = 0;
+                
+                normalAudio.play().catch(() => resolve());
+                normalAudio.onended = () => resolve();
             });
         }
 
+        // TỐI ƯU TOÀN DIỆN CHO IPHONE/SAFARI: Phát bản tin mượt mà, dứt khoát không lag đơ
         async function startPlaying() {
             if (isPlaying) return;
             const text = toTelex(realText);
             if (!text.trim()) return;
+
+            // Mở khóa bắt buộc cho Safari Audio Context ngay khi bấm nút
+            normalAudio.play().catch(() => {}); normalAudio.pause();
+            chAudio.play().catch(() => {}); chAudio.pause();
+
             setUIState(true);
 
-            await new Promise(r => setTimeout(r, 500));
+            await new Promise(r => setTimeout(r, 400));
             await playAudioFile("AR.mp3");
-            await new Promise(r => setTimeout(r, 600));
+            await new Promise(r => setTimeout(r, 500));
 
             const words = text.split(' ');
             for (let i = 0; i < words.length; i++) {
@@ -798,13 +803,15 @@
                     if (!isPlaying) break;
                     
                     if (word[j] === 'C' && word[j+1] === 'H') {
+                        // XỬ LÝ CHÊN SAFARI: Phát luồng riêng biệt trên kênh thứ 2, giải phóng bộ nhớ ngay lập tức
                         for (let k = 0; k < 4; k++) {
                             if (!isPlaying) break;
                             
-                            let quickAudio = new Audio(SOUND_PATH + "T.mp3");
-                            activeAudios.push(quickAudio); 
-                            quickAudio.play().catch(() => {});
+                            chAudio.src = SOUND_PATH + "T.mp3";
+                            chAudio.currentTime = 0;
+                            chAudio.play().catch(() => {});
                             
+                            // Khoảng cách nhịp gối đầu lý tưởng cho Safari di động (380ms không bị dính chữ)
                             await new Promise(r => setTimeout(r, 380)); 
                         }
                         await new Promise(r => setTimeout(r, speedSettings.charGap)); 
@@ -820,7 +827,7 @@
                 if (i < words.length - 1) await new Promise(r => setTimeout(r, speedSettings.wordGap));
             }
             if (isPlaying) { 
-                await new Promise(r => setTimeout(r, 800)); 
+                await new Promise(r => setTimeout(r, 600)); 
                 await playAudioFile("NW.mp3"); 
             }
             stopPlaying();
@@ -828,13 +835,12 @@
 
         function stopPlaying() { 
             isPlaying = false; 
-            activeAudios.forEach(audio => {
-                try {
-                    audio.pause();
-                    audio.currentTime = 0;
-                } catch(e){}
-            });
-            activeAudios = []; 
+            try {
+                normalAudio.pause();
+                normalAudio.currentTime = 0;
+                chAudio.pause();
+                chAudio.currentTime = 0;
+            } catch(e){}
             setUIState(false); 
         }
 
