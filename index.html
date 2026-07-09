@@ -559,9 +559,8 @@
         let realText = "", isHidden = false, isPlaying = false;
         let speedSettings = { charGap: 350, wordGap: 1000 };
 
-        // GIẢI PHÁP CHO SAFARI: Chỉ khởi tạo cố định 2 luồng kênh Audio độc lập để tái sử dụng
+        // Đối tượng Audio tĩnh phục vụ khả năng tương thích Safari iOS
         const normalAudio = new Audio();
-        const chAudio = new Audio();
 
         const input = document.getElementById('inputText');
         const telexPreview = document.getElementById('telexPreview');
@@ -764,28 +763,24 @@
             else if(val === 'fast') speedSettings = { charGap: 100, wordGap: 500 };
         };
 
-        // Hàm phát chuẩn cho Safari: Tái sử dụng luồng thiết bị, không tạo đối tượng rác ngầm
         async function playAudioFile(fileName) {
             return new Promise((resolve) => {
                 if (!isPlaying) { resolve(); return; }
                 normalAudio.src = SOUND_PATH + fileName;
-                normalAudio.textControlToken = Math.random(); // Đánh dấu token
                 normalAudio.currentTime = 0;
-                
                 normalAudio.play().catch(() => resolve());
                 normalAudio.onended = () => resolve();
             });
         }
 
-        // TỐI ƯU TOÀN DIỆN CHO IPHONE/SAFARI: Phát bản tin mượt mà, dứt khoát không lag đơ
+        // ĐÃ UPDATE: Tạm thời bỏ qua âm thanh chữ CH, không phát 4 tiếng T nữa
         async function startPlaying() {
             if (isPlaying) return;
             const text = toTelex(realText);
             if (!text.trim()) return;
 
-            // Mở khóa bắt buộc cho Safari Audio Context ngay khi bấm nút
+            // Kích hoạt giải phóng Audio Policy cho Safari iOS
             normalAudio.play().catch(() => {}); normalAudio.pause();
-            chAudio.play().catch(() => {}); chAudio.pause();
 
             setUIState(true);
 
@@ -803,18 +798,7 @@
                     if (!isPlaying) break;
                     
                     if (word[j] === 'C' && word[j+1] === 'H') {
-                        // XỬ LÝ CHÊN SAFARI: Phát luồng riêng biệt trên kênh thứ 2, giải phóng bộ nhớ ngay lập tức
-                        for (let k = 0; k < 4; k++) {
-                            if (!isPlaying) break;
-                            
-                            chAudio.src = SOUND_PATH + "T.mp3";
-                            chAudio.currentTime = 0;
-                            chAudio.play().catch(() => {});
-                            
-                            // Khoảng cách nhịp gối đầu lý tưởng cho Safari di động (380ms không bị dính chữ)
-                            await new Promise(r => setTimeout(r, 380)); 
-                        }
-                        await new Promise(r => setTimeout(r, speedSettings.charGap)); 
+                        // TẠM THỜI BỎ QUA PHÁT ÂM THANH CH: Chỉ nhảy index qua 2 ký tự (C và H) để tránh bị lỗi dính chữ
                         j += 2;
                     } else {
                         if (morseMap[word[j]]) { 
@@ -838,8 +822,6 @@
             try {
                 normalAudio.pause();
                 normalAudio.currentTime = 0;
-                chAudio.pause();
-                chAudio.currentTime = 0;
             } catch(e){}
             setUIState(false); 
         }
