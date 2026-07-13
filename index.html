@@ -672,7 +672,8 @@
         }
 
         input.addEventListener('input', () => { 
-            realText = input.value; 
+            // ĐÃ SỬA: Quy về chữ thường ngay khi người dùng gõ nhập liệu trực tiếp
+            realText = input.value.toLowerCase(); 
             isHidden = false; 
             statusHeader.innerText = "HỆ THỐNG MORSE"; 
             updateDisplay(); 
@@ -724,6 +725,7 @@
             }
         });
 
+        // Kích hoạt sinh văn bản ngẫu nhiên đa chế độ (Đã dọn sạch tuyệt đối dấu ngoặc kép)
         document.getElementById('btnGenerate').onclick = async () => {
             const currentMode = modeSelect.value;
             if (currentMode === 'translate') return;
@@ -735,9 +737,16 @@
                 try {
                     const response = await fetch('random.txt?v=' + Math.random());
                     const rawText = await response.text();
-                    const allWords = rawText.split(/\s+/).map(w => w.replace(/[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/g, '').trim()).filter(w => w.length >= 2);
-                    for (let i = 0; i < count; i++) selected.push(allWords[Math.floor(Math.random() * allWords.length)]);
-                    realText = selected.join(' '); 
+                    
+                    // SỬA ĐỒNG BỘ: Regex nâng cao dọn sạch mọi loại dấu ngoặc kép "", “”, và các ký tự đặc biệt lạ
+                    const allWords = rawText.split(/\s+/)
+                        .map(w => w.replace(/[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?“”‘’"']+/g, '').trim())
+                        .filter(w => w.length >= 2);
+                        
+                    for (let i = 0; i < count; i++) {
+                        selected.push(allWords[Math.floor(Math.random() * allWords.length)]);
+                    }
+                    realText = selected.join(' ').toLowerCase(); 
                     statusHeader.innerText = "CHẾ ĐỘ NGẪU NHIÊN";
                 } catch (err) { 
                     alert("Lỗi tải file cấu trúc random.txt"); 
@@ -748,7 +757,7 @@
                 for (let i = 0; i < count; i++) {
                     selected.push(sourcePool[Math.floor(Math.random() * sourcePool.length)]);
                 }
-                realText = selected.join(' '); 
+                realText = selected.join(' ').toLowerCase(); 
                 statusHeader.innerText = currentMode === 'group8' ? "NGẪU NHIÊN: NHÓM 8 CHỮ" : "NGẪU NHIÊN: NHÓM MỞ RỘNG";
             }
 
@@ -773,13 +782,11 @@
             });
         }
 
-        // ĐÃ UPDATE: Tạm thời bỏ qua âm thanh chữ CH, không phát 4 tiếng T nữa
         async function startPlaying() {
             if (isPlaying) return;
             const text = toTelex(realText);
             if (!text.trim()) return;
 
-            // Kích hoạt giải phóng Audio Policy cho Safari iOS
             normalAudio.play().catch(() => {}); normalAudio.pause();
 
             setUIState(true);
@@ -798,7 +805,6 @@
                     if (!isPlaying) break;
                     
                     if (word[j] === 'C' && word[j+1] === 'H') {
-                        // TẠM THỜI BỎ QUA PHÁT ÂM THANH CH: Chỉ nhảy index qua 2 ký tự (C và H) để tránh bị lỗi dính chữ
                         j += 2;
                     } else {
                         if (morseMap[word[j]]) { 
