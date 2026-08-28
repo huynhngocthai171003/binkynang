@@ -1,4 +1,11 @@
+# Không cache hoặc cache ngắn hạn cho file HTML chính để trang luôn tải bản mới nhất lập tức
 [[headers]]
-  for = "/*"
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Cache vĩnh viễn cho các tệp tĩnh thực sự (âm thanh, hình ảnh, font chữ)
+[[headers]]
+  for = "/sounds_morse/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
