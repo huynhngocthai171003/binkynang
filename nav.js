@@ -10,58 +10,61 @@ const NAVIGATION_CONFIG = {
     icon: "subtitles", 
     defaultPage: "morse.html", // Đổi từ index.html thành morse.html
     pages: ["morse.html", "learn.html", "index_2.html"] 
-},
-            { 
-                id: "semaphore", 
-                label: "Semaphore", 
-                icon: "sign_language", 
-                defaultPage: "semaphore.html",
-                pages: ["semaphore.html", "challenge_sem.html", "learn_sem.html"] 
-            }
-        ]
-    },
-    matthu: {
-        title: "MẬT THƯ",
-        icon: "enhanced_encryption",
-        items: [
-            { 
-    id: "thaythe", 
-    label: "Thay thế", 
-    icon: "swap_horiz", 
-    defaultPage: "index.html", // Đã đổi từ thaythe.html thành index.html
-    pages: ["index.html", "thaythe_2.html", "mt_toa_do.html", "mt_bang_hang_cot.html", "nhatrang.html"] 
-},
-            { 
-                id: "camranh", 
-                label: "Dời chỗ", 
-                icon: "grid_on", 
-                defaultPage: "camranh.html",
-                pages: ["camranh.html"] 
-            }
+}
+            // ,
+            // { 
+            //     id: "semaphore", 
+            //     label: "Semaphore", 
+            //     icon: "sign_language", 
+            //     defaultPage: "semaphore.html",
+            //     pages: ["semaphore.html", "challenge_sem.html", "learn_sem.html"] 
+            // }
         ]
     }
+//     ,
+//     matthu: {
+//         title: "MẬT THƯ",
+//         icon: "enhanced_encryption",
+//         items: [
+//             { 
+//     id: "thaythe", 
+//     label: "Thay thế", 
+//     icon: "swap_horiz", 
+//     defaultPage: "index.html", // Đã đổi từ thaythe.html thành index.html
+//     pages: ["index.html", "thaythe_2.html", "mt_toa_do.html", "mt_bang_hang_cot.html", "nhatrang.html"] 
+// },
+//             { 
+//                 id: "camranh", 
+//                 label: "Dời chỗ", 
+//                 icon: "grid_on", 
+//                 defaultPage: "camranh.html",
+//                 pages: ["camranh.html"] 
+//             }
+//         ]
+//     }
 };
 
 const SUBNAV_DATA = {
     index: [
         { path: "index.html", label: "LUYỆN TẬP (MÃ HÓA & TRUYỀN TIN)" },
         { path: "learn.html", label: "HỌC TẬP MORSE (TRA CỨU ĐỐI XỨNG)" }
-    ],
-    semaphore: [
-        { path: "semaphore.html", label: "LUYỆN TẬP (MÃ HÓA & TRUYỀN TIN)" },
-        { path: "challenge_sem.html", label: "THỬ THÁCH (TRÒ CHƠI GIẢI MÃ)" },
-        { path: "learn_sem.html", label: "HỌC TẬP SEMAPHORE (TRA CỨU VỊ TRÍ)" }
-    ],
-    thaythe: [
-        { path: "thaythe.html", label: "MẬT THƯ THAY THẾ (CAESAR)" },
-        { path: "mt_toa_do.html", label: "MẬT THƯ TỌA ĐỘ (MA TRẬN SỐ/CHỮ)" },
-        { path: "mt_bang_hang_cot.html", label: "MẬT THƯ BẢNG - HÀNG - CỘT" },
-        { path: "nhatrang.html", label: "MẬT THƯ KHÓA TỪ (NHA TRANG)" }
-    ],
-    camranh: [
-        { path: "camranh.html", label: "ITEM 1 (MẬT THƯ DỜI CHỖ CHÍNH)" },
-        { path: "item2.html", label: "ITEM 2 (NỘI DUNG TÙY CHỈNH THÊM)" }
     ]
+    // ,
+    // semaphore: [
+    //     { path: "semaphore.html", label: "LUYỆN TẬP (MÃ HÓA & TRUYỀN TIN)" },
+    //     { path: "challenge_sem.html", label: "THỬ THÁCH (TRÒ CHƠI GIẢI MÃ)" },
+    //     { path: "learn_sem.html", label: "HỌC TẬP SEMAPHORE (TRA CỨU VỊ TRÍ)" }
+    // ],
+    // thaythe: [
+    //     { path: "thaythe.html", label: "MẬT THƯ THAY THẾ (CAESAR)" },
+    //     { path: "mt_toa_do.html", label: "MẬT THƯ TỌA ĐỘ (MA TRẬN SỐ/CHỮ)" },
+    //     { path: "mt_bang_hang_cot.html", label: "MẬT THƯ BẢNG - HÀNG - CỘT" },
+    //     { path: "nhatrang.html", label: "MẬT THƯ KHÓA TỪ (NHA TRANG)" }
+    // ],
+    // camranh: [
+    //     { path: "camranh.html", label: "ITEM 1 (MẬT THƯ DỜI CHỖ CHÍNH)" },
+    //     { path: "item2.html", label: "ITEM 2 (NỘI DUNG TÙY CHỈNH THÊM)" }
+    // ]
 };
 
 document.addEventListener("DOMContentLoaded", () => {
