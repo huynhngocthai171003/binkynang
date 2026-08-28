@@ -9,7 +9,7 @@ const NAVIGATION_CONFIG = {
     label: "Morse Code", 
     icon: "subtitles", 
     defaultPage: "morse.html", // Đổi từ index.html thành morse.html
-    pages: ["morse.html", "learn.html", "index_2.html"] 
+    pages: ["index.html", "learn.html", "index_2.html"] 
 }
             // ,
             // { 
